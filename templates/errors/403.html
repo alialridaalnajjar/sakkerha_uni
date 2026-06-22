@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Access Denied{% endblock %}
+
+{% block content %}
+<section class="error-page">
+  <div class="container">
+    <div class="error-card fade-up">
+
+      <div class="error-code">403</div>
+
+      <div class="error-icon">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M8 8l8 8M16 8l-8 8" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h1>Access Denied</h1>
+      <p class="error-sub">
+        {{ message or "You don't have permission to view this page." }}
+      </p>
+
+      <div class="btn-row" style="justify-content:center;margin-top:32px">
+        {% if session.get('user_id') %}
+          {% if session.get('user_role') == 'admin' %}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+          {% else %}
+            <a href="{{ url_for('report.map_view') }}" class="btn btn-primary">Go to Map</a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Log In</a>
+        {% endif %}
+        <a href="{{ url_for('auth.home') }}" class="btn btn-ghost">Back to Home</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
