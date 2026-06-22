@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="fade-up">
+      <div class="pill"><span class="dot"></span>LIVE CITY UPDATES</div>
+      <h1 class="headline">FIX THE FLOW <br /><span class="accent">OF YOUR CITY.</span></h1>
+      <p class="lede">Sakkerha empowers citizens to report potholes, street waste, and infrastructure issues directly to the municipality.</p>
+      <div class="btn-row">
+        {% if session.get('user_id') and session.get('user_role') == 'user' %}
+          <a href="{{ url_for('report.map_view') }}" class="btn btn-primary">Report an Issue</a>
+        {% else %}
+          <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Get Started</a>
+        {% endif %}
+        <a href="#how" class="btn btn-ghost">How it works</a>
+      </div>
+    </div>
+    <div class="hero-visual fade-up delay">
+      <div class="hero-img">
+        <img src="{{ url_for('static', filename='assets/landingimg1.png') }}" alt="City street" width="1024" height="1024" />
+      </div>
+      <div class="hero-card">
+        <div class="label">Recently Resolved</div>
+        <div class="title">Pothole on 5th Ave</div>
+        <div class="sub">Fixed in 4 hours</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="stats">
+  <div class="container stats-grid">
+    <div><div class="stat-n">1,047</div><div class="stat-l">Reports Filed</div></div>
+    <div><div class="stat-n">91%</div><div class="stat-l">Resolution Rate</div></div>
+    <div><div class="stat-n">2.4h</div><div class="stat-l">Avg Response</div></div>
+    <div><div class="stat-n">21k+</div><div class="stat-l">Active Citizens</div></div>
+  </div>
+</section>
+<section class="block">
+  <div class="container">
+    <div class="h-row">
+      <h2 class="section-title">Report Categories</h2>
+      <div class="section-meta">SELECT AN ISSUE TYPE</div>
+    </div>
+    <div class="cat-grid">
+      <div class="cat p"><div class="ico">P</div><h3>Potholes</h3><p>Damaged road surfaces affecting traffic safety and vehicles.</p></div>
+      <div class="cat a"><div class="ico">D</div><h3>Debris</h3><p>Construction waste or fallen objects blocking sidewalks.</p></div>
+      <div class="cat f"><div class="ico">M</div><h3>Manholes</h3><p>Open or damaged utility covers posing a pedestrian risk.</p></div>
+      <div class="cat p"><div class="ico">W</div><h3>Street Waste</h3><p>Illegal dumping or overflowing public garbage bins.</p></div>
+    </div>
+  </div>
+</section>
+<section id="how" class="block how">
+  <div class="container how-grid">
+    <div class="how-img"><img src="{{ url_for('static', filename='assets/mobilecover.png') }}" alt="App pin" width="1000" height="1200" loading="lazy" /></div>
+    <div>
+      <h2>Your report in <br /><span class="accent">three clicks.</span></h2>
+      <div class="steps">
+        <div class="step"><div class="n">01</div><div><h4>Pin the Location</h4><p>Click on the map or enter coordinates manually — we find the exact spot.</p></div></div>
+        <div class="step"><div class="n">02</div><div><h4>Snap a Photo</h4><p>Capture the issue directly. Up to 3 images help our team assess severity faster.</p></div></div>
+        <div class="step"><div class="n">03</div><div><h4>AI Assesses Severity</h4><p>Gemini instantly rates criticality as Low, Medium, or High.</p></div></div>
+        <div class="step"><div class="n">04</div><div><h4>Track Status</h4><p>Watch your report move from Pending to Completed in real time on the map.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="block">
+  <div class="container">
+    <h2 class="section-title" style="text-align:center;margin-bottom:48px">Voices from the block</h2>
+    <div class="test-grid">
+      <div class="test"><p>"Reported a missing manhole cover at 9pm. Replaced before sunrise. Wild."</p><div class="who">Sarah J. — Neighborhood Lead</div></div>
+      <div class="test"><p>"Finally a tool that proves the city is listening. Watching 'Resolved' pop up feels great."</p><div class="who">Mark T. — Daily Commuter</div></div>
+      <div class="test"><p>"Cleaner streets, fewer flat tires. My block hasn't looked this good in years."</p><div class="who">Elena R. — Local Resident</div></div>
+    </div>
+  </div>
+</section>
+<section class="cta-wrap">
+  <div class="container">
+    <div class="cta">
+      <h2>Ready to clean up your block?</h2>
+      <a href="{{ url_for('auth.signup') }}" class="btn-light">Join Sakkerha Today</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
