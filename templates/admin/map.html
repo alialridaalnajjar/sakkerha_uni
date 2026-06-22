@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Admin Map{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/map.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="map-page">
+  <div class="map-layout">
+
+    <aside class="map-sidebar">
+      <div class="sidebar-header">
+        <div class="pill"><span class="dot"></span>ADMIN MAP</div>
+        <h2>All Reports</h2>
+        <p class="sidebar-sub">Live overview of all ongoing and completed street reports.</p>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-title">MAP LEGEND</div>
+        <div class="legend-items">
+          <div class="legend-item"><span class="legend-dot ongoing"></span>Ongoing</div>
+          <div class="legend-item"><span class="legend-dot completed"></span>Completed</div>
+          <div class="legend-item"><span class="legend-sev high"></span>High severity</div>
+          <div class="legend-item"><span class="legend-sev medium"></span>Medium severity</div>
+          <div class="legend-item"><span class="legend-sev low"></span>Low severity</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="admin-stats" style="margin-top:8px">
+        <div class="a-stat">
+          <div class="a-stat-n" id="count-high" style="color:#c0392b">—</div>
+          <div class="a-stat-l">High</div>
+        </div>
+        <div class="a-stat">
+          <div class="a-stat-n" id="count-medium" style="color:#b7770d">—</div>
+          <div class="a-stat-l">Medium</div>
+        </div>
+        <div class="a-stat">
+          <div class="a-stat-n" id="count-low" style="color:#1e8449">—</div>
+          <div class="a-stat-l">Low</div>
+        </div>
+        <div class="a-stat">
+          <div class="a-stat-n" id="count-total">—</div>
+          <div class="a-stat-l">Total</div>
+        </div>
+      </div>
+
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost btn-full" style="margin-top:8px">
+        &larr; Back to Dashboard
+      </a>
+    </aside>
+
+    <div class="map-container" id="map"></div>
+  </div>
+</section>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  window.REPORTS_DATA = {{ reports_json | safe }};
+  window.IS_USER      = false;
+  window.IS_ADMIN     = true;
+</script>
+<script src="{{ url_for('static', filename='scripts/map.js') }}"></script>
+{% endblock %}

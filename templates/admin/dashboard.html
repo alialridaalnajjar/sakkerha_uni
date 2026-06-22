@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/admin.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+  <div class="container">
+
+    <!-- Page header -->
+    <div class="admin-header">
+      <div>
+        <div class="pill"><span class="dot"></span>ADMIN PANEL</div>
+        <h1>Reports Dashboard</h1>
+        <p class="admin-sub">Manage, triage, and resolve citizen-filed street reports.</p>
+      </div>
+      <!-- Quick stats -->
+      <div class="admin-stats">
+        <div class="a-stat">
+          <div class="a-stat-n">{{ reports | selectattr('status','eq','pending')   | list | length }}</div>
+          <div class="a-stat-l">Pending</div>
+        </div>
+        <div class="a-stat">
+          <div class="a-stat-n">{{ reports | selectattr('status','eq','ongoing')   | list | length }}</div>
+          <div class="a-stat-l">Ongoing</div>
+        </div>
+        <div class="a-stat">
+          <div class="a-stat-n">{{ reports | selectattr('status','eq','completed') | list | length }}</div>
+          <div class="a-stat-l">Completed</div>
+        </div>
+        <div class="a-stat">
+          <div class="a-stat-n">{{ reports | selectattr('status','eq','rejected')  | list | length }}</div>
+          <div class="a-stat-l">Rejected</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <form method="GET" action="{{ url_for('admin.dashboard') }}" class="filter-bar">
+      <div class="filter-group">
+        <input type="text" name="search" placeholder="Search description or email…"
+               value="{{ filters.search }}" class="filter-input" />
+      </div>
+      <div class="filter-group">
+        <select name="status" class="filter-select">
+          <option value="">All Statuses</option>
+          {% for s in statuses %}
+            <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>
+              {{ s | capitalize }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group">
+        <select name="severity" class="filter-select">
+          <option value="">All Severities</option>
+          {% for sv in severities %}
+            <option value="{{ sv }}" {% if filters.severity == sv %}selected{% endif %}>
+              {{ sv | capitalize }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Clear</a>
+    </form>
+
+    <!-- Reports table -->
+    {% if reports %}
+    <div class="reports-table-wrap">
+      <table class="reports-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Reporter</th>
+            <th>Description</th>
+            <th>Coords</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in reports %}
+          <tr data-report-id="{{ r.id }}">
+            <td class="mono">{{ r.id }}</td>
+            <td>
+              <div class="reporter-cell">
+                <div class="avatar-sm">{{ r.reporter_name[0] }}</div>
+                <span>{{ r.reporter_name }}</span>
+              </div>
+            </td>
+            <td class="desc-cell">{{ r.description | truncate(60) }}</td>
+            <td class="mono small">{{ "%.4f"|format(r.latitude) }}, {{ "%.4f"|format(r.longitude) }}</td>
+            <td>
+              {% if r.severity %}
+                <span class="badge sev-{{ r.severity }}">{{ r.severity | upper }}</span>
+              {% else %}
+                <span class="badge sev-unknown">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge status-{{ r.status }}">{{ r.status | capitalize }}</span>
+            </td>
+            <td class="mono small">{{ r.created_at.strftime('%b %d, %Y') if r.created_at else '—' }}</td>
+            <td>
+              <div class="action-btns">
+                <a href="{{ url_for('admin.report_detail', report_id=r.id) }}" class="btn-sm btn-outline">View</a>
+                {% if r.status not in ('completed', 'rejected') %}
+                  {% if r.status == 'pending' %}
+                    <button class="btn-sm btn-action" data-id="{{ r.id }}" data-status="ongoing">Accept</button>
+                    <button class="btn-sm btn-danger" data-id="{{ r.id }}" data-status="rejected">Reject</button>
+                  {% elif r.status == 'ongoing' %}
+                    <button class="btn-sm btn-action" data-id="{{ r.id }}" data-status="completed">Complete</button>
+                    <button class="btn-sm btn-danger" data-id="{{ r.id }}" data-status="rejected">Reject</button>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>No reports found</h3>
+      <p>Try adjusting your filters or check back later.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='scripts/admin.js') }}"></script>
+{% endblock %}
