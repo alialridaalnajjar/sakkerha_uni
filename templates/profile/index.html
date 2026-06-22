@@ -160,6 +160,35 @@
           {% endif %}
         </div>
 
+        <!-- Danger zone -->
+        <div class="profile-section">
+          <div class="section-toggle" id="danger-toggle">
+            <h3 style="color:var(--primary)">Delete Account</h3>
+            <span class="toggle-arrow">{{ '▴' if delete_open else '▾' }}</span>
+          </div>
+          <div class="edit-form{{ ' open' if delete_open else '' }}" id="danger-form">
+            {% if delete_error %}
+              <div class="form-error" style="margin-bottom:16px">{{ delete_error }}</div>
+            {% endif %}
+            <p style="color:var(--muted);font-size:13px;margin:0 0 16px;line-height:1.6">
+              This permanently deletes your account and all your reports. This action cannot be undone.
+            </p>
+            <form method="POST" action="{{ url_for('profile.delete_account') }}">
+              <div class="field">
+                <label for="del_current_password">Current Password</label>
+                <input type="password" id="del_current_password" name="current_password"
+                       placeholder="••••••••" required />
+              </div>
+              <div class="field">
+                <label for="confirm_phrase">Type <strong>DELETE MY ACCOUNT</strong> to confirm</label>
+                <input type="text" id="confirm_phrase" name="confirm_phrase"
+                       placeholder="DELETE MY ACCOUNT" required />
+              </div>
+              <button type="submit" class="btn btn-danger btn-full">Permanently Delete My Account</button>
+            </form>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -182,6 +211,41 @@
     pwForm.classList.toggle('open');
     pwToggle.querySelector('.toggle-arrow').textContent =
       pwForm.classList.contains('open') ? '▴' : '▾';
+  });
+
+  const dangerToggle = document.getElementById('danger-toggle');
+  const dangerForm   = document.getElementById('danger-form');
+  dangerToggle.addEventListener('click', () => {
+    dangerForm.classList.toggle('open');
+    dangerToggle.querySelector('.toggle-arrow').textContent =
+      dangerForm.classList.contains('open') ? '▴' : '▾';
+  });
+
+  // Delete own report
+  document.querySelectorAll('.delete-my-report-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (btn.disabled) return;
+      const id = btn.dataset.id;
+      if (!confirm('Delete this report? This cannot be undone.')) return;
+      btn.disabled  = true;
+      btn.innerHTML = '...';
+      try {
+        const res  = await fetch(`/report/${id}/delete`, { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          document.querySelector(`[data-report-id="${id}"]`).remove();
+        } else {
+          alert(data.error || 'Could not delete report.');
+          btn.disabled  = false;
+          btn.innerHTML = '&#x1F5D1;';
+        }
+      } catch (err) {
+        alert('Network error.');
+        btn.disabled  = false;
+        btn.innerHTML = '&#x1F5D1;';
+      }
+    });
   });
 </script>
 {% endblock %}

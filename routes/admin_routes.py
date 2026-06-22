@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import Blueprint, session, redirect, url_for, flash, abort
 from controllers.admin_controller import (
-    map_view, dashboard, report_detail, update_status,
+    map_view, dashboard, report_detail, update_status, delete_report,
     admin_profile, admin_edit_profile, admin_upload_pfp, admin_remove_pfp
 )
 
@@ -28,3 +28,4 @@ admin_bp.add_url_rule("/profile/pfp/upload",            "upload_pfp",   admin_re
 admin_bp.add_url_rule("/profile/pfp/remove",            "remove_pfp",   admin_required(admin_remove_pfp),   methods=["POST"])
 admin_bp.add_url_rule("/report/<int:report_id>",        "report_detail",admin_required(report_detail),      methods=["GET"])
 admin_bp.add_url_rule("/report/<int:report_id>/status", "update_status",admin_required(update_status),      methods=["POST"])
+admin_bp.add_url_rule("/report/<int:report_id>/delete", "delete_report",admin_required(delete_report),      methods=["POST"])

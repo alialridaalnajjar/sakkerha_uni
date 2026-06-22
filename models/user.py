@@ -65,6 +65,15 @@ class User(db.Model):
             user.image_pfp = pfp_url
             db.session.commit()
 
+    @classmethod
+    def delete_account(cls, user_id):
+        user = db.session.get(cls, user_id)
+        if user:
+            db.session.delete(user)  # cascades to reports via relationship
+            db.session.commit()
+            return True
+        return False
+
     def save(self):
         db.session.add(self)
         db.session.commit()

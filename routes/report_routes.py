@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import Blueprint, session, redirect, url_for, flash, abort
-from controllers.report_controller import map_view, submit_report, report_detail
+from controllers.report_controller import map_view, submit_report, report_detail, delete_report
 
 report_bp = Blueprint("report", __name__)
 
@@ -30,3 +30,4 @@ def user_required(f):
 report_bp.add_url_rule("/map",                    "map_view", map_view,                       methods=["GET"])
 report_bp.add_url_rule("/report/submit",          "submit",   user_required(submit_report),   methods=["POST"])
 report_bp.add_url_rule("/report/<int:report_id>", "detail",   report_detail,                  methods=["GET"])
+report_bp.add_url_rule("/report/<int:report_id>/delete", "delete", user_required(delete_report), methods=["POST"])

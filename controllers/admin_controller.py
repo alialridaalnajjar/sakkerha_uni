@@ -148,3 +148,11 @@ def admin_remove_pfp():
     session["user_pfp"] = None
     flash("Profile picture removed.", "info")
     return redirect(url_for("admin.profile"))
+
+
+def delete_report(report_id):
+    report = Report.find_by_id(report_id)
+    if not report:
+        return jsonify({"ok": False, "error": "Report not found."}), 404
+    Report.delete(report_id)
+    return jsonify({"ok": True})

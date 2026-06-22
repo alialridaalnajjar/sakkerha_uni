@@ -89,6 +89,15 @@ class Report(db.Model):
             report.updated_at = datetime.utcnow()
             db.session.commit()
 
+    @classmethod
+    def delete(cls, report_id):
+        report = db.session.get(cls, report_id)
+        if report:
+            db.session.delete(report)
+            db.session.commit()
+            return True
+        return False
+
     def save(self):
         db.session.add(self)
         db.session.commit()

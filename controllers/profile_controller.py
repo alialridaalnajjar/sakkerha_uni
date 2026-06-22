@@ -1,4 +1,4 @@
-import os, uuid, requests as http_requests
+import uuid
 from flask import render_template, redirect, url_for, session, request, flash, current_app
 from werkzeug.utils import secure_filename
 from models.user import User
@@ -13,22 +13,23 @@ def allowed_file(f):
 
 def _upload_to_firebase(file, folder="pfp"):
     """Upload a file object to Firebase Storage, return public download URL."""
+    import requests as http_requests
+    from urllib.parse import quote
+
     ext      = secure_filename(file.filename).rsplit(".", 1)[1].lower()
     filename = f"{folder}/{uuid.uuid4().hex}.{ext}"
     bucket   = Config.FIREBASE_STORAGE_BUCKET
     api_key  = Config.FIREBASE_API_KEY
 
-    # Read file bytes
     file_bytes = file.read()
     mime = {
         "png": "image/png", "gif": "image/gif",
         "webp": "image/webp", "jpg": "image/jpeg", "jpeg": "image/jpeg"
     }.get(ext, "image/jpeg")
 
-    # Upload via Firebase Storage REST API
     upload_url = (
         f"https://firebasestorage.googleapis.com/v0/b/{bucket}/o"
-        f"?name={requests_quote(filename)}&key={api_key}"
+        f"?name={quote(filename)}&key={api_key}"
     )
     resp = http_requests.post(
         upload_url,
@@ -39,20 +40,14 @@ def _upload_to_firebase(file, folder="pfp"):
     resp.raise_for_status()
     data = resp.json()
 
-    # Build public download URL
-    encoded_name = requests_quote(filename, safe="")
-    download_url = (
+    encoded_name = quote(filename, safe="")
+    return (
         f"https://firebasestorage.googleapis.com/v0/b/{bucket}/o/"
         f"{encoded_name}?alt=media&token={data.get('downloadTokens','')}"
     )
-    return download_url
 
 
-def requests_quote(s, safe=""):
-    from urllib.parse import quote
-    return quote(s, safe=safe)
-
-
+# ── View profile ──────────────────────────────────────────
 def view_profile():
     user_id = session.get("user_id")
     user    = User.find_by_id(user_id)
@@ -63,6 +58,7 @@ def view_profile():
     return render_template("profile/index.html", user=user, reports=reports)
 
 
+# ── Edit profile (bio, dob) ───────────────────────────────
 def edit_profile():
     user_id = session.get("user_id")
     bio     = request.form.get("bio", "").strip()
@@ -84,6 +80,7 @@ def edit_profile():
     return redirect(url_for("profile.view"))
 
 
+# ── Upload profile picture ────────────────────────────────
 def upload_pfp():
     user_id = session.get("user_id")
     file    = request.files.get("pfp")
@@ -103,6 +100,7 @@ def upload_pfp():
     return redirect(url_for("profile.view"))
 
 
+# ── Remove profile picture ────────────────────────────────
 def remove_pfp():
     user_id = session.get("user_id")
     try:
@@ -114,11 +112,12 @@ def remove_pfp():
     return redirect(url_for("profile.view"))
 
 
+# ── Change password ────────────────────────────────────────
 def change_password():
     user_id           = session.get("user_id")
     current_password  = request.form.get("current_password", "")
     new_password       = request.form.get("new_password", "")
-    confirm_password   = request.form.get("confirm_password", "")
+    confirm_password    = request.form.get("confirm_password", "")
 
     user    = User.find_by_id(user_id)
     reports = Report.find_by_user(user_id)
@@ -149,3 +148,32 @@ def change_password():
 
     flash("Password updated successfully.", "success")
     return redirect(url_for("profile.view"))
+
+
+# ── Delete account ─────────────────────────────────────────
+def delete_account():
+    user_id          = session.get("user_id")
+    current_password = request.form.get("current_password", "")
+    confirm_phrase     = request.form.get("confirm_phrase", "").strip()
+
+    user    = User.find_by_id(user_id)
+    reports = Report.find_by_user(user_id)
+
+    def render_with_error(error_msg):
+        return render_template("profile/index.html", user=user, reports=reports,
+                               delete_error=error_msg, delete_open=True)
+
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("profile.view"))
+
+    if not user.verify_password(current_password):
+        return render_with_error("Incorrect password.")
+
+    if confirm_phrase != "DELETE MY ACCOUNT":
+        return render_with_error('Please type exactly "DELETE MY ACCOUNT" to confirm.')
+
+    User.delete_account(user_id)
+    session.clear()
+    flash("Your account has been permanently deleted.", "info")
+    return redirect(url_for("auth.home"))

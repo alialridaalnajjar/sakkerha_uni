@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import Blueprint, session, redirect, url_for, flash, abort
-from controllers.profile_controller import view_profile, edit_profile, upload_pfp, remove_pfp, change_password
+from controllers.profile_controller import view_profile, edit_profile, upload_pfp, remove_pfp, change_password, delete_account
 
 profile_bp = Blueprint("profile", __name__, url_prefix="/profile")
 
@@ -22,3 +22,4 @@ profile_bp.add_url_rule("/edit",            "edit",            login_required(ed
 profile_bp.add_url_rule("/pfp/upload",      "upload_pfp",      login_required(upload_pfp),       methods=["POST"])
 profile_bp.add_url_rule("/pfp/remove",      "remove_pfp",      login_required(remove_pfp),       methods=["POST"])
 profile_bp.add_url_rule("/change-password", "change_password", login_required(change_password),  methods=["POST"])
+profile_bp.add_url_rule("/delete-account",  "delete_account",  login_required(delete_account),   methods=["POST"])

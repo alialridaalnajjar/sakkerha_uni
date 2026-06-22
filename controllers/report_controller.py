@@ -112,6 +112,21 @@ def submit_report():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 # ── Report detail ─────────────────────────────────────────
+def delete_report(report_id):
+    user_id = session.get("user_id")
+    report  = Report.find_by_id(report_id)
+
+    if not report:
+        return jsonify({"ok": False, "error": "Report not found."}), 404
+    if report.user_id != user_id:
+        return jsonify({"ok": False, "error": "You can only delete your own reports."}), 403
+    if report.status not in ("pending", "rejected", "invalid"):
+        return jsonify({"ok": False, "error": "Only pending, rejected, or invalid reports can be deleted."}), 400
+
+    Report.delete(report_id)
+    return jsonify({"ok": True})
+
+
 def report_detail(report_id):
     report = Report.find_by_id(report_id)
     if not report:
