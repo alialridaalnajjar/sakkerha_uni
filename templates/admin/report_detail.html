@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Report #{{ report.id }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/admin.css') }}" />
+{% endblock %}
+{% block content %}
+<section class="admin-page">
+  <div class="container">
+    <a href="{{ url_for('admin.dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
+    <div class="detail-grid">
+      <div class="detail-main">
+        <div class="detail-header">
+          <div><span class="mono" style="color:var(--muted);font-size:13px">REPORT #{{ report.id }}</span><h1>{{ report.description | truncate(80) }}</h1></div>
+          <div class="badge-row">
+            <span class="badge sev-{{ report.severity or 'unknown' }}">{{ (report.severity or '&#8212;') | upper }}</span>
+            <span class="badge status-{{ report.status }}">{{ report.status | capitalize }}</span>
+          </div>
+        </div>
+        <div class="detail-card"><div class="detail-section-title">Description</div><p>{{ report.description }}</p></div>
+        {% if report.ai_note %}
+        <div class="detail-card ai-card"><div class="detail-section-title"><span class="ai-badge">AI</span> Gemini Assessment</div><p>{{ report.ai_note }}</p></div>
+        {% endif %}
+        {% if report.images %}
+        <div class="detail-card"><div class="detail-section-title">Attached Photos</div>
+          <div class="detail-images">{% for img in report.images %}<a href="{{ img }}" target="_blank" class="detail-img-wrap"><img src="{{ img }}" alt="Report image" loading="lazy" /></a>{% endfor %}</div>
+        </div>
+        {% endif %}
+        <div class="detail-card">
+          <div class="detail-section-title">Location</div>
+          <div class="mono small" style="margin-bottom:12px">LAT {{ report.latitude }} &middot; LNG {{ report.longitude }}</div>
+          <div id="detail-map" style="height:280px;border-radius:12px;overflow:hidden"></div>
+        </div>
+      </div>
+      <div class="detail-sidebar">
+        <div class="detail-card">
+          <div class="detail-section-title">Reporter</div>
+          <div class="reporter-block">
+            <div class="avatar-lg">{{ report.reporter_name[0] }}</div>
+            <div><div class="reporter-name">{{ report.reporter_name }}</div><div class="reporter-email mono small">{{ report.user_email }}</div></div>
+          </div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-section-title">Timeline</div>
+          <div class="timeline-item"><span class="mono small">Filed</span><span>{{ report.created_at.strftime('%b %d, %Y %H:%M') if report.created_at else '&#8212;' }}</span></div>
+          <div class="timeline-item"><span class="mono small">Updated</span><span>{{ report.updated_at.strftime('%b %d, %Y %H:%M') if report.updated_at else '&#8212;' }}</span></div>
+        </div>
+        {% if report.status not in ('completed','rejected') %}
+        <div class="detail-card">
+          <div class="detail-section-title">Update Status</div>
+          <div id="action-error" class="form-error" style="display:none"></div>
+          <div class="action-stack">
+            {% if report.status == 'pending' %}
+              <button class="btn btn-primary btn-full status-btn" data-id="{{ report.id }}" data-status="ongoing">&#10003; Accept &rarr; Mark Ongoing</button>
+              <button class="btn btn-danger btn-full status-btn"  data-id="{{ report.id }}" data-status="rejected">&#10005; Reject Report</button>
+            {% elif report.status == 'ongoing' %}
+              <button class="btn btn-primary btn-full status-btn" data-id="{{ report.id }}" data-status="completed">&#10003; Mark as Completed</button>
+              <button class="btn btn-danger btn-full status-btn"  data-id="{{ report.id }}" data-status="rejected">&#10005; Reject Report</button>
+            {% endif %}
+          </div>
+        </div>
+        {% else %}
+        <div class="detail-card"><div class="detail-section-title">Status</div><p style="color:var(--muted);font-size:14px">This report is <strong>{{ report.status }}</strong> and can no longer be changed.</p></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='scripts/admin.js') }}"></script>
+<script>
+  const m = L.map('detail-map').setView([{{ report.latitude }}, {{ report.longitude }}], 16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(m);
+  L.circleMarker([{{ report.latitude }}, {{ report.longitude }}],{radius:10,color:'#d63a1d',fillColor:'#d63a1d',fillOpacity:0.85,weight:2}).addTo(m).bindPopup('Report #{{ report.id }}').openPopup();
+</script>
+{% endblock %}
