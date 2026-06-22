@@ -1,0 +1,127 @@
+/* ══════════════════════════════════════════════════════════
+   Profile Page
+══════════════════════════════════════════════════════════ */
+
+.profile-page { padding: 48px 0 96px; }
+
+/* ── Grid ──────────────────────────────────────────────── */
+.profile-grid {
+  display: grid; gap: 28px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 900px) {
+  .profile-grid { grid-template-columns: 300px 1fr; align-items: start; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Profile Card (left)
+══════════════════════════════════════════════════════════ */
+.profile-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 36px 28px;
+  text-align: center;
+  position: sticky; top: 100px;
+}
+
+/* ── Avatar ────────────────────────────────────────────── */
+.avatar-xl {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 28px;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 24px -8px rgba(214,58,29,0.4);
+}
+
+/* ── Name / email ──────────────────────────────────────── */
+.profile-name {
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.02em; margin: 0 0 4px;
+}
+.profile-email { color: var(--muted); }
+
+/* ── Bio ───────────────────────────────────────────────── */
+.profile-bio {
+  margin: 20px 0; padding: 16px;
+  background: var(--secondary); border-radius: 12px;
+  font-size: 14px; line-height: 1.65; text-align: left;
+  color: var(--fg);
+}
+.profile-bio p { margin: 0; }
+
+/* ── Meta rows ─────────────────────────────────────────── */
+.profile-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.profile-meta:last-of-type { border-bottom: none; }
+.profile-meta .mono { color: var(--muted); }
+
+/* ══════════════════════════════════════════════════════════
+   Profile Main (right)
+══════════════════════════════════════════════════════════ */
+.profile-main { display: flex; flex-direction: column; gap: 24px; }
+
+.profile-section {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+}
+
+/* ── Section header ────────────────────────────────────── */
+.profile-section > h3 {
+  font-size: 16px; font-weight: 700; margin: 0;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.section-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.section-toggle:hover { background: var(--secondary); }
+.section-toggle h3 { font-size: 16px; font-weight: 700; margin: 0; }
+.toggle-arrow { font-size: 14px; color: var(--muted); transition: transform 0.2s; }
+
+/* ── Edit form (collapsible) ───────────────────────────── */
+.edit-form {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.2s;
+  padding: 0 24px;
+}
+.edit-form.open {
+  max-height: 600px;
+  padding: 24px;
+}
+
+/* ── Count badge ───────────────────────────────────────── */
+.count-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--primary); color: #fff;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  width: 22px; height: 22px; border-radius: 50%;
+}
+
+/* ── Report list ───────────────────────────────────────── */
+.report-list { padding: 8px 0; }
+.report-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; border-bottom: 1px solid var(--border);
+  transition: background 0.15s; gap: 12px;
+  cursor: pointer;
+}
+.report-row:last-child { border-bottom: none; }
+.report-row:hover { background: rgba(243,239,230,0.6); }
+.report-row-left { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+.report-desc {
+  font-size: 14px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.report-meta { color: var(--muted); margin-top: 2px; }
+
+/* ── Empty state inside profile ────────────────────────── */
+.profile-section .empty-state {
+  border: none; border-radius: 0;
+  padding: 48px 24px;
+}

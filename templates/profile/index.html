@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/profile.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+  <div class="container">
+    <div class="profile-grid">
+
+      <!-- ── Left: Profile card ── -->
+      <aside class="profile-card">
+
+        <!-- Avatar / PFP -->
+        {% if user.image_pfp %}
+          <img src="{{ user.image_pfp }}" alt="Profile picture"
+               style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 16px;display:block;border:3px solid var(--primary)" />
+        {% else %}
+          <div class="avatar-xl">{{ user.initials }}</div>
+        {% endif %}
+
+        <h2 class="profile-name">{{ user.full_name }}</h2>
+        <div class="profile-email mono small">{{ user.email }}</div>
+        <div class="badge status-ongoing" style="margin:12px auto 0;display:inline-block">
+          {{ user.role | capitalize }}
+        </div>
+
+        <!-- Bio -->
+        <div class="profile-bio">
+          {% if user.bio %}
+            <p>{{ user.bio }}</p>
+          {% else %}
+            <p class="muted-text">No bio yet. Add one below.</p>
+          {% endif %}
+        </div>
+
+        {% if user.dob %}
+        <div class="profile-meta">
+          <span class="mono small">DOB</span>
+          <span>{{ user.dob.strftime('%B %d, %Y') }}</span>
+        </div>
+        {% endif %}
+
+        <div class="profile-meta">
+          <span class="mono small">MEMBER SINCE</span>
+          <span>{{ user.created_at.strftime('%B %Y') if user.created_at else '—' }}</span>
+        </div>
+
+        <!-- PFP upload/remove -->
+        <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px">
+          <form method="POST" action="{{ url_for('profile.upload_pfp') }}" enctype="multipart/form-data">
+            <label class="btn btn-ghost btn-full" style="cursor:pointer;text-align:center;padding:10px">
+              <input type="file" name="pfp" accept="image/*" style="display:none" onchange="this.form.submit()" />
+              {{ 'Change Photo' if user.image_pfp else 'Upload Photo' }}
+            </label>
+          </form>
+          {% if user.image_pfp %}
+          <form method="POST" action="{{ url_for('profile.remove_pfp') }}">
+            <button type="submit" class="btn btn-ghost btn-full"
+                    style="color:var(--primary);border-color:var(--primary)">
+              Remove Photo
+            </button>
+          </form>
+          {% endif %}
+        </div>
+
+        <!-- Sign out -->
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-full" style="margin-top:16px">
+          Sign Out
+        </a>
+      </aside>
+
+      <!-- ── Right: Edit + Reports ── -->
+      <div class="profile-main">
+
+        <!-- Edit profile -->
+        <div class="profile-section">
+          <div class="section-toggle" id="edit-toggle">
+            <h3>Edit Profile</h3>
+            <span class="toggle-arrow">▾</span>
+          </div>
+          <div class="edit-form" id="edit-form">
+            <form method="POST" action="{{ url_for('profile.edit') }}">
+              <div class="field">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" rows="3"
+                  placeholder="Tell the city a little about yourself…">{{ user.bio or '' }}</textarea>
+              </div>
+              <div class="field">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob"
+                  value="{{ user.dob.isoformat() if user.dob else '' }}" />
+              </div>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Change password -->
+        <div class="profile-section">
+          <div class="section-toggle" id="pw-toggle">
+            <h3>Change Password</h3>
+            <span class="toggle-arrow">{{ '▴' if pw_open else '▾' }}</span>
+          </div>
+          <div class="edit-form{{ ' open' if pw_open else '' }}" id="pw-form">
+            {% if pw_error %}
+              <div class="form-error" style="margin-bottom:16px">{{ pw_error }}</div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('profile.change_password') }}">
+              <div class="field">
+                <label for="current_password">Current Password</label>
+                <input type="password" id="current_password" name="current_password"
+                       placeholder="••••••••" required autocomplete="current-password" />
+              </div>
+              <div class="field">
+                <label for="new_password">New Password <span class="label-hint">(min. 8 characters)</span></label>
+                <input type="password" id="new_password" name="new_password"
+                       placeholder="••••••••" required minlength="8" autocomplete="new-password" />
+              </div>
+              <div class="field">
+                <label for="confirm_password">Confirm New Password</label>
+                <input type="password" id="confirm_password" name="confirm_password"
+                       placeholder="••••••••" required autocomplete="new-password" />
+              </div>
+              <button type="submit" class="btn btn-primary">Update Password</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- My reports -->
+        <div class="profile-section">
+          <h3>My Reports <span class="count-badge">{{ reports | length }}</span></h3>
+          {% if reports %}
+            <div class="report-list">
+              {% for r in reports %}
+              <a href="{{ url_for('report.detail', report_id=r.id) }}" class="report-row">
+                <div class="report-row-left">
+                  <span class="badge sev-{{ r.severity or 'unknown' }}">{{ (r.severity or '—') | upper }}</span>
+                  <div>
+                    <div class="report-desc">{{ r.description | truncate(70) }}</div>
+                    <div class="report-meta mono small">
+                      {{ r.created_at.strftime('%b %d, %Y') if r.created_at else '—' }}
+                      · LAT {{ "%.4f"|format(r.latitude) }} LNG {{ "%.4f"|format(r.longitude) }}
+                    </div>
+                  </div>
+                </div>
+                <span class="badge status-{{ r.status }}">{{ r.status | capitalize }}</span>
+              </a>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-icon">📍</div>
+              <h4>No reports yet</h4>
+              <p>Head to the map and file your first street report.</p>
+              <a href="{{ url_for('report.map_view') }}" class="btn btn-primary" style="margin-top:16px">Open Map</a>
+            </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const toggle = document.getElementById('edit-toggle');
+  const form   = document.getElementById('edit-form');
+  toggle.addEventListener('click', () => {
+    form.classList.toggle('open');
+    toggle.querySelector('.toggle-arrow').textContent =
+      form.classList.contains('open') ? '▴' : '▾';
+  });
+
+  const pwToggle = document.getElementById('pw-toggle');
+  const pwForm   = document.getElementById('pw-form');
+  pwToggle.addEventListener('click', () => {
+    pwForm.classList.toggle('open');
+    pwToggle.querySelector('.toggle-arrow').textContent =
+      pwForm.classList.contains('open') ? '▴' : '▾';
+  });
+</script>
+{% endblock %}
