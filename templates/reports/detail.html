@@ -125,16 +125,11 @@
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  const m = L.map('detail-map').setView([{{ report.latitude }}, {{ report.longitude }}], 16);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(m);
-  L.circleMarker([{{ report.latitude }}, {{ report.longitude }}], {
-    radius: 10,
-    color: '#d63a1d',
-    fillColor: '#d63a1d',
-    fillOpacity: 0.85,
-    weight: 2
-  }).addTo(m).bindPopup('Report #{{ report.id }}').openPopup();
+  window.REPORT_DATA = {
+    id: {{ report.id }},
+    lat: {{ report.latitude }},
+    lng: {{ report.longitude }}
+  };
 </script>
+<script src="{{ url_for('static', filename='scripts/report_detail.js') }}"></script>
 {% endblock %}

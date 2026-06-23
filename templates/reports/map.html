@@ -163,10 +163,10 @@
 
 <!-- Leaflet JS MUST come before map.js -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{{ url_for('static', filename='scripts/map.js') }}"></script>
 <script>
   window.REPORTS_DATA = {{ reports_json | safe }};
   window.IS_USER      = {% if session.get('user_role') == 'user' %}true{% else %}false{% endif %};
   window.SUBMIT_URL   = "{{ url_for('report.submit') }}";
 </script>
+<script src="{{ url_for('static', filename='scripts/map.js') }}"></script>
 {% endblock %}
