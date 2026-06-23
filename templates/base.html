@@ -4,15 +4,19 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>{% block title %}Sakkerha{% endblock %} — Fix the Flow of Your City</title>
+  <!-- the links for the base page -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /> 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}" />
   {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-<nav class="nav">
+  <!-- navbar which is a componenet that we will later use ALOTTTTTTT WALLAHI -->
+  <!-- dont format the code its making problems with jinja ya ali ( guess aya ali feena 😃 ) -->
+
+  <nav class="nav">
   <div class="container nav-inner">
     <a href="{{ url_for('auth.home') }}" class="brand">
       <div class="brand-mark">S</div>
@@ -50,7 +54,7 @@
       <span></span><span></span><span></span>
     </button>
   </div>
-
+  <!-- its says mobile nav soo.. -->
   <div class="nav-mobile">
     <div class="col">
       {% if session.get('user_id') %}
@@ -70,6 +74,8 @@
     </div>
   </div>
 </nav>
+
+
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}

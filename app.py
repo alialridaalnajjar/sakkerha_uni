@@ -1,22 +1,24 @@
+# importing the libraries needed for the congfig of our APP
 from flask import Flask
 from flask_mail import Mail
 from config import Config
 from database import init_db
 
+#Creating of the app and loading the config from confuig class
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# ── SQLAlchemy URI (Flask-SQLAlchemy uses SQLALCHEMY_DATABASE_URI) ────
+# setting up the db and making track mod false for performance
 app.config["SQLALCHEMY_DATABASE_URI"]    = Config.DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# ── Mail ──────────────────────────────────────────────────
+# creating the mail service for 3rd party pass reset laterr
 mail = Mail(app)
 
-# ── Initialize ORM + create tables ───────────────────────
+# db connection and db initalize
 init_db(app)
 
-# ── Register Blueprints ───────────────────────────────────
+# setting up the blueprints which are the modules lal app
 from routes.auth_routes    import auth_bp
 from routes.report_routes  import report_bp
 from routes.admin_routes   import admin_bp
@@ -27,15 +29,15 @@ app.register_blueprint(report_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(profile_bp)
 
-# ── Root redirect ─────────────────────────────────────────
+#redirects imports
 from flask import redirect, url_for, render_template
-
+#entry of the app redirect us lal home page
 @app.route("/")
 def index():
     return redirect(url_for("auth.home"))
 
 
-# ── Global error handlers ─────────────────────────────────
+# error handling for 403 errrrs anywhere
 @app.errorhandler(403)
 def forbidden(e):
     message = getattr(e, "description", None)
