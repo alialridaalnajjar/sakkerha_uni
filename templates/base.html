@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>{% block title %}Sakkerha{% endblock %} — Fix the Flow of Your City</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -38,7 +38,7 @@
           {% else %}
             <div class="nav-avatar">{{ session.get('initials','?') }}</div>
           {% endif %}
-          <span class="nav-username">{{ session.get('user_name','').split()[0] }}</span>
+          <span class="nav-username">@{{ session.get('user_username', session.get('user_name','').split()[0]) }}</span>
         </a>
       {% else %}
         <a href="{{ url_for('report.map_view') }}" class="link">Map</a>
@@ -119,9 +119,8 @@
       <div class="f-col">
         <div class="f-col-title">Contact</div>
         <ul>
-          <li><a href="mailto:hello@sakkerha.city">sakkerha@gmail.com</a></li>
-          <li><a href="#">+961 81 553 833</a></li>
-          <li><a href="#">+961 71 235 971</a></li>
+          <li><a href="mailto:hello@sakkerha.city">hello@sakkerha.city</a></li>
+          <li><a href="#">+961 1 000 000</a></li>
         </ul>
       </div>
     </div>

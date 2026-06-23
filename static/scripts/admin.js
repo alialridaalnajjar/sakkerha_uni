@@ -3,30 +3,33 @@
    Used by: admin/dashboard.html + admin/report_detail.html
 ════════════════════════════════════════════════════════ */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // ── Dashboard table buttons ───────────────────────────
-  document.querySelectorAll('[data-id][data-status]').forEach(btn => {
+  document.querySelectorAll("[data-id][data-status]").forEach((btn) => {
     btn.dataset.origLabel = btn.textContent.trim();
-    btn.addEventListener('click', () => {
-      if (btn.disabled || btn.dataset.busy === '1') return;
+    btn.addEventListener("click", () => {
+      if (btn.disabled || btn.dataset.busy === "1") return;
       updateStatus(btn.dataset.id, btn.dataset.status, btn);
       // ── Delete buttons ─────────────────────────────────────
-  document.querySelectorAll('.delete-report-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (btn.disabled) return;
-      const id = btn.dataset.id;
-      if (!confirm(`Permanently delete report #${id}? This cannot be undone.`)) return;
-      deleteReport(id, btn);
+      document.querySelectorAll(".delete-report-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (btn.disabled) return;
+          const id = btn.dataset.id;
+          if (
+            !confirm(`Permanently delete report #${id}? This cannot be undone.`)
+          )
+            return;
+          deleteReport(id, btn);
+        });
+      });
     });
-  });
-});
   });
 
   // ── Detail page buttons (.status-btn) ────────────────
-  document.querySelectorAll('.status-btn').forEach(btn => {
+  document.querySelectorAll(".status-btn").forEach((btn) => {
     btn.dataset.origLabel = btn.textContent.trim();
-    btn.addEventListener('click', () => {
-      if (btn.disabled || btn.dataset.busy === '1') return;
+    btn.addEventListener("click", () => {
+      if (btn.disabled || btn.dataset.busy === "1") return;
       updateStatus(btn.dataset.id, btn.dataset.status, btn, true);
     });
   });
@@ -34,17 +37,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ── Core update function ──────────────────────────────── */
 async function updateStatus(id, status, triggerEl, isDetailPage = false) {
-  const errBox = document.getElementById('action-error');
+  const errBox = document.getElementById("action-error");
 
   // Lock the button immediately — prevents double submission
-  triggerEl.disabled  = true;
-  triggerEl.dataset.busy = '1';
+  triggerEl.disabled = true;
+  triggerEl.dataset.busy = "1";
   triggerEl.innerHTML = '<span class="spinner"></span>';
 
   try {
-    const res  = await fetch(`/admin/report/${id}/status`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch(`/admin/report/${id}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
     const data = await res.json();
@@ -57,16 +60,16 @@ async function updateStatus(id, status, triggerEl, isDetailPage = false) {
       }
       // Leave button disabled — row/page will reflect the new terminal/transition state
     } else {
-      showErr(errBox, data.error || 'Update failed.');
-      triggerEl.disabled    = false;
-      triggerEl.dataset.busy = '0';
-      triggerEl.textContent  = triggerEl.dataset.origLabel || 'Update';
+      showErr(errBox, data.error || "Update failed.");
+      triggerEl.disabled = false;
+      triggerEl.dataset.busy = "0";
+      triggerEl.textContent = triggerEl.dataset.origLabel || "Update";
     }
   } catch (e) {
-    showErr(errBox, 'Network error. Please try again.');
-    triggerEl.disabled    = false;
-    triggerEl.dataset.busy = '0';
-    triggerEl.textContent  = triggerEl.dataset.origLabel || 'Update';
+    showErr(errBox, "Network error. Please try again.");
+    triggerEl.disabled = false;
+    triggerEl.dataset.busy = "0";
+    triggerEl.textContent = triggerEl.dataset.origLabel || "Update";
   }
 }
 
@@ -78,26 +81,30 @@ function updateTableRow(id, newStatus) {
   // Update status badge
   const statusCell = row.querySelector('.badge[class*="status-"]');
   if (statusCell) {
-    statusCell.className  = `badge status-${newStatus}`;
+    statusCell.className = `badge status-${newStatus}`;
     statusCell.textContent = cap(newStatus);
   }
 
   // Replace action buttons with terminal state message
-  const actionsCell = row.querySelector('.action-btns');
+  const actionsCell = row.querySelector(".action-btns");
   if (actionsCell) {
-    if (newStatus === 'completed' || newStatus === 'rejected') {
-      actionsCell.innerHTML =
-        `<span class="mono" style="font-size:11px;color:var(--muted)">${cap(newStatus)}</span>`;
-    } else if (newStatus === 'ongoing') {
+    if (newStatus === "completed" || newStatus === "rejected") {
+      actionsCell.innerHTML = `<span class="mono" style="font-size:11px;color:var(--muted)">${cap(newStatus)}</span>`;
+    } else if (newStatus === "ongoing") {
       // Show complete + reject
       actionsCell.innerHTML = `
         <a href="/admin/report/${id}" class="btn-sm btn-outline">View</a>
         <button class="btn-sm btn-action"  data-id="${id}" data-status="completed">Complete</button>
         <button class="btn-sm btn-danger"  data-id="${id}" data-status="rejected">Reject</button>`;
       // Re-attach listeners on new buttons
-      actionsCell.querySelectorAll('[data-id][data-status]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (!confirm(`Mark report #${btn.dataset.id} as "${statusLabel(btn.dataset.status)}"?`)) return;
+      actionsCell.querySelectorAll("[data-id][data-status]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (
+            !confirm(
+              `Mark report #${btn.dataset.id} as "${statusLabel(btn.dataset.status)}"?`,
+            )
+          )
+            return;
           updateStatus(btn.dataset.id, btn.dataset.status, btn);
         });
       });
@@ -107,47 +114,58 @@ function updateTableRow(id, newStatus) {
 
 /* ── Delete report ─────────────────────────────────────── */
 async function deleteReport(id, btn) {
-  btn.disabled  = true;
+  btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>';
   try {
-    const res  = await fetch(`/admin/report/${id}/delete`, { method: 'POST' });
+    const res = await fetch(`/admin/report/${id}/delete`, { method: "POST" });
     const data = await res.json();
     if (data.ok) {
       const row = document.querySelector(`tr[data-report-id="${id}"]`);
       if (row) row.remove();
-      else window.location.href = '/admin/';
+      else window.location.href = "/admin/";
     } else {
-      showErr(document.getElementById('action-error'), data.error || 'Delete failed.');
-      btn.disabled  = false;
-      btn.innerHTML = '&#x1F5D1;';
+      showErr(
+        document.getElementById("action-error"),
+        data.error || "Delete failed.",
+      );
+      btn.disabled = false;
+      btn.innerHTML = "&#x1F5D1;";
     }
   } catch (e) {
-    showErr(document.getElementById('action-error'), 'Network error.');
-    btn.disabled  = false;
-    btn.innerHTML = '&#x1F5D1;';
+    showErr(document.getElementById("action-error"), "Network error.");
+    btn.disabled = false;
+    btn.innerHTML = "&#x1F5D1;";
   }
 }
 function statusLabel(s) {
-  const map = { ongoing: 'Ongoing', completed: 'Completed', rejected: 'Rejected' };
+  const map = {
+    ongoing: "Ongoing",
+    completed: "Completed",
+    rejected: "Rejected",
+  };
   return map[s] || cap(s);
 }
-function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
+function cap(s) {
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
 function showErr(el, msg) {
   if (!el) {
     // Fallback inline banner instead of a native alert popup
-    const banner = document.createElement('div');
-    banner.className = 'form-error';
-    banner.style.position = 'fixed';
-    banner.style.top = '20px';
-    banner.style.right = '20px';
-    banner.style.zIndex = '9999';
-    banner.style.maxWidth = '320px';
+    const banner = document.createElement("div");
+    banner.className = "form-error";
+    banner.style.position = "fixed";
+    banner.style.top = "20px";
+    banner.style.right = "20px";
+    banner.style.zIndex = "9999";
+    banner.style.maxWidth = "320px";
     banner.textContent = msg;
     document.body.appendChild(banner);
     setTimeout(() => banner.remove(), 4000);
     return;
   }
-  el.textContent   = msg;
-  el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 5000);
+  el.textContent = msg;
+  el.style.display = "block";
+  setTimeout(() => {
+    el.style.display = "none";
+  }, 5000);
 }

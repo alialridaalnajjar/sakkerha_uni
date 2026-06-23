@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+
 {% block content %}
+
+<!-- ═══════════ HERO ═══════════ -->
 <section class="hero">
   <div class="container hero-grid">
     <div class="fade-up">
       <div class="pill"><span class="dot"></span>LIVE CITY UPDATES</div>
       <h1 class="headline">FIX THE FLOW <br /><span class="accent">OF YOUR CITY.</span></h1>
-      <p class="lede">Sakkerha empowers citizens to report potholes, street waste, and infrastructure issues directly to the municipality.</p>
+      <p class="lede">
+        Sakkerha empowers citizens to report potholes, street waste, and infrastructure
+        issues directly to the municipality. Fast, transparent, and action-oriented.
+      </p>
       <div class="btn-row">
         {% if session.get('user_id') and session.get('user_role') == 'user' %}
           <a href="{{ url_for('report.map_view') }}" class="btn btn-primary">Report an Issue</a>
@@ -18,24 +24,36 @@
     </div>
     <div class="hero-visual fade-up delay">
       <div class="hero-img">
-        <img src="{{ url_for('static', filename='assets/landingimg1.png') }}" alt="City street" width="1024" height="1024" />
+        <img src="{{ url_for('static', filename='assets/landingimg1.png') }}"
+             alt="A damaged city street with a large pothole"
+             width="1024" height="1024" />
       </div>
       <div class="hero-card">
-        <div class="label">Recently Resolved</div>
-        <div class="title">Pothole on 5th Ave</div>
-        <div class="sub">Fixed in 4 hours</div>
+        {% if last_completed %}
+          <div class="label">Recently Resolved</div>
+          <div class="title">{{ last_completed.description | truncate(38) }}</div>
+          <div class="sub">{{ fixed_time_label or 'Recently completed' }}</div>
+        {% else %}
+          <div class="label">Live Status</div>
+          <div class="title">No issues resolved yet</div>
+          <div class="sub" style="color:var(--muted)">Be the first to report one</div>
+        {% endif %}
       </div>
     </div>
   </div>
 </section>
+
+<!-- ═══════════ STATS ═══════════ -->
 <section class="stats">
   <div class="container stats-grid">
-    <div><div class="stat-n">1,047</div><div class="stat-l">Reports Filed</div></div>
-    <div><div class="stat-n">91%</div><div class="stat-l">Resolution Rate</div></div>
+    <div><div class="stat-n">12,482</div><div class="stat-l">Reports Filed</div></div>
+    <div><div class="stat-n">94%</div><div class="stat-l">Resolution Rate</div></div>
     <div><div class="stat-n">2.4h</div><div class="stat-l">Avg Response</div></div>
-    <div><div class="stat-n">21k+</div><div class="stat-l">Active Citizens</div></div>
+    <div><div class="stat-n">50k+</div><div class="stat-l">Active Citizens</div></div>
   </div>
 </section>
+
+<!-- ═══════════ CATEGORIES ═══════════ -->
 <section class="block">
   <div class="container">
     <div class="h-row">
@@ -50,20 +68,40 @@
     </div>
   </div>
 </section>
+
+<!-- ═══════════ HOW ═══════════ -->
 <section id="how" class="block how">
   <div class="container how-grid">
-    <div class="how-img"><img src="{{ url_for('static', filename='assets/mobilecover.png') }}" alt="App pin" width="1000" height="1200" loading="lazy" /></div>
+    <div class="how-img">
+      <img src="{{ url_for('static', filename='assets/mobilecover.png') }}"
+           alt="Phone showing the Sakkerha app with a pin dropped on a map"
+           width="1000" height="1200" loading="lazy" />
+    </div>
     <div>
       <h2>Your report in <br /><span class="accent">three clicks.</span></h2>
       <div class="steps">
-        <div class="step"><div class="n">01</div><div><h4>Pin the Location</h4><p>Click on the map or enter coordinates manually — we find the exact spot.</p></div></div>
-        <div class="step"><div class="n">02</div><div><h4>Snap a Photo</h4><p>Capture the issue directly. Up to 3 images help our team assess severity faster.</p></div></div>
-        <div class="step"><div class="n">03</div><div><h4>AI Assesses Severity</h4><p>Gemini instantly rates criticality as Low, Medium, or High.</p></div></div>
-        <div class="step"><div class="n">04</div><div><h4>Track Status</h4><p>Watch your report move from Pending to Completed in real time on the map.</p></div></div>
+        <div class="step">
+          <div class="n">01</div>
+          <div><h4>Snap a Photo</h4><p>Capture the issue directly. Up to 3 images help our team assess severity faster.</p></div>
+        </div>
+        <div class="step">
+          <div class="n">02</div>
+          <div><h4>Pin the Location</h4><p>Click on the map or enter coordinates manually — we find the exact spot.</p></div>
+        </div>
+        <div class="step">
+          <div class="n">03</div>
+          <div><h4>AI Assesses Severity</h4><p>Our AI instantly rates criticality as Low, Medium, or High so teams prioritize correctly.</p></div>
+        </div>
+        <div class="step">
+          <div class="n">04</div>
+          <div><h4>Track Status</h4><p>Watch your report move from Pending → Ongoing → Completed in real time on the map.</p></div>
+        </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- ═══════════ TESTIMONIALS ═══════════ -->
 <section class="block">
   <div class="container">
     <h2 class="section-title" style="text-align:center;margin-bottom:48px">Voices from the block</h2>
@@ -74,6 +112,8 @@
     </div>
   </div>
 </section>
+
+<!-- ═══════════ CTA ═══════════ -->
 <section class="cta-wrap">
   <div class="container">
     <div class="cta">
@@ -82,4 +122,17 @@
     </div>
   </div>
 </section>
+
+<!-- ═══════════ WISSAM — 3D mascot ═══════════ -->
+<div id="wissam-wrap" class="wissam-wrap">
+  <div id="wissam-bubble" class="wissam-bubble"></div>
+  <button id="wissam-close" class="wissam-close" aria-label="Dismiss Wissam">&times;</button>
+  <div id="wissam-container" class="wissam-canvas" title="Click me for a tip!"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="{{ url_for('static', filename='scripts/wissam.js') }}"></script>
 {% endblock %}

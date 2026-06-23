@@ -196,56 +196,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-  const toggle = document.getElementById('edit-toggle');
-  const form   = document.getElementById('edit-form');
-  toggle.addEventListener('click', () => {
-    form.classList.toggle('open');
-    toggle.querySelector('.toggle-arrow').textContent =
-      form.classList.contains('open') ? '▴' : '▾';
-  });
-
-  const pwToggle = document.getElementById('pw-toggle');
-  const pwForm   = document.getElementById('pw-form');
-  pwToggle.addEventListener('click', () => {
-    pwForm.classList.toggle('open');
-    pwToggle.querySelector('.toggle-arrow').textContent =
-      pwForm.classList.contains('open') ? '▴' : '▾';
-  });
-
-  const dangerToggle = document.getElementById('danger-toggle');
-  const dangerForm   = document.getElementById('danger-form');
-  dangerToggle.addEventListener('click', () => {
-    dangerForm.classList.toggle('open');
-    dangerToggle.querySelector('.toggle-arrow').textContent =
-      dangerForm.classList.contains('open') ? '▴' : '▾';
-  });
-
-  // Delete own report
-  document.querySelectorAll('.delete-my-report-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      if (btn.disabled) return;
-      const id = btn.dataset.id;
-      if (!confirm('Delete this report? This cannot be undone.')) return;
-      btn.disabled  = true;
-      btn.innerHTML = '...';
-      try {
-        const res  = await fetch(`/report/${id}/delete`, { method: 'POST' });
-        const data = await res.json();
-        if (data.ok) {
-          document.querySelector(`[data-report-id="${id}"]`).remove();
-        } else {
-          alert(data.error || 'Could not delete report.');
-          btn.disabled  = false;
-          btn.innerHTML = '&#x1F5D1;';
-        }
-      } catch (err) {
-        alert('Network error.');
-        btn.disabled  = false;
-        btn.innerHTML = '&#x1F5D1;';
-      }
-    });
-  });
-</script>
+<script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
 {% endblock %}

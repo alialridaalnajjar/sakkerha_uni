@@ -1,36 +1,50 @@
-{% extends "base.html" %}
-{% block title %}Admin Profile{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='styles/profile.css') }}" />
-<link rel="stylesheet" href="{{ url_for('static', filename='styles/admin.css') }}" />
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Admin Profile{% endblock %} {% block
+extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='styles/profile.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='styles/admin.css') }}"
+/>
+{% endblock %} {% block content %}
 <section class="profile-page">
   <div class="container">
     <div class="profile-grid">
-
       <!-- ── Left: Profile card ── -->
       <aside class="profile-card">
-
         <!-- Avatar / PFP -->
         {% if user.image_pfp %}
-          <img src="{{ user.image_pfp }}" alt="Profile picture"
-               style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 16px;display:block;border:3px solid var(--primary)" />
+        <img
+          src="{{ user.image_pfp }}"
+          alt="Profile picture"
+          style="
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 16px;
+            display: block;
+            border: 3px solid var(--primary);
+          "
+        />
         {% else %}
-          <div class="avatar-xl">{{ user.initials }}</div>
+        <div class="avatar-xl">{{ user.initials }}</div>
         {% endif %}
 
         <h2 class="profile-name">{{ user.full_name }}</h2>
         <div class="profile-email mono small">{{ user.email }}</div>
-        <div class="badge status-ongoing" style="margin:12px auto 0;display:inline-block">Admin</div>
+        <div
+          class="badge status-ongoing"
+          style="margin: 12px auto 0; display: inline-block"
+        >
+          Admin
+        </div>
 
         {% if user.bio %}
         <div class="profile-bio"><p>{{ user.bio }}</p></div>
-        {% endif %}
-
-        {% if user.dob %}
+        {% endif %} {% if user.dob %}
         <div class="profile-meta">
           <span class="mono small">DOB</span>
           <span>{{ user.dob.strftime('%B %d, %Y') }}</span>
@@ -39,36 +53,61 @@
 
         <div class="profile-meta">
           <span class="mono small">MEMBER SINCE</span>
-          <span>{{ user.created_at.strftime('%B %Y') if user.created_at else '—' }}</span>
+          <span
+            >{{ user.created_at.strftime('%B %Y') if user.created_at else '—'
+            }}</span
+          >
         </div>
 
         <!-- PFP upload -->
-        <div style="margin-top:20px">
-          <form method="POST" action="{{ url_for('admin.upload_pfp') }}" enctype="multipart/form-data">
-            <label class="btn btn-ghost btn-full" style="cursor:pointer;text-align:center;padding:10px">
-              <input type="file" name="pfp" accept="image/*" style="display:none"
-                     onchange="this.form.submit()" />
+        <div style="margin-top: 20px">
+          <form
+            method="POST"
+            action="{{ url_for('admin.upload_pfp') }}"
+            enctype="multipart/form-data"
+          >
+            <label
+              class="btn btn-ghost btn-full"
+              style="cursor: pointer; text-align: center; padding: 10px"
+            >
+              <input
+                type="file"
+                name="pfp"
+                accept="image/*"
+                style="display: none"
+                onchange="this.form.submit()"
+              />
               {{ 'Change Photo' if user.image_pfp else 'Upload Photo' }}
             </label>
           </form>
           {% if user.image_pfp %}
-          <form method="POST" action="{{ url_for('admin.remove_pfp') }}" style="margin-top:8px">
-            <button type="submit" class="btn btn-ghost btn-full"
-                    style="color:var(--primary);border-color:var(--primary)">
+          <form
+            method="POST"
+            action="{{ url_for('admin.remove_pfp') }}"
+            style="margin-top: 8px"
+          >
+            <button
+              type="submit"
+              class="btn btn-ghost btn-full"
+              style="color: var(--primary); border-color: var(--primary)"
+            >
               Remove Photo
             </button>
           </form>
           {% endif %}
         </div>
 
-        <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-full" style="margin-top:16px">
+        <a
+          href="{{ url_for('auth.logout') }}"
+          class="btn btn-ghost btn-full"
+          style="margin-top: 16px"
+        >
           Sign Out
         </a>
       </aside>
 
       <!-- ── Right: Edit + Reports being tackled ── -->
       <div class="profile-main">
-
         <!-- Edit profile -->
         <div class="profile-section">
           <div class="section-toggle" id="edit-toggle">
@@ -79,37 +118,55 @@
             <form method="POST" action="{{ url_for('admin.edit_profile') }}">
               <div class="field">
                 <label for="bio">Bio</label>
-                <textarea id="bio" name="bio" rows="3"
-                  placeholder="Tell the team about yourself...">{{ user.bio or '' }}</textarea>
+                <textarea
+                  id="bio"
+                  name="bio"
+                  rows="3"
+                  placeholder="Tell the team about yourself..."
+                >
+{{ user.bio or '' }}</textarea
+                >
               </div>
               <div class="field">
                 <label for="dob">Date of Birth</label>
-                <input type="date" id="dob" name="dob"
-                  value="{{ user.dob.isoformat() if user.dob else '' }}" />
+                <input
+                  type="date"
+                  id="dob"
+                  name="dob"
+                  value="{{ user.dob.isoformat() if user.dob else '' }}"
+                />
               </div>
-              <button type="submit" class="btn btn-primary">Save Changes</button>
+              <button type="submit" class="btn btn-primary">
+                Save Changes
+              </button>
             </form>
           </div>
         </div>
 
         <!-- Reports being tackled (ongoing) -->
         <div class="profile-section">
-          <h3>Reports I'm Tackling
+          <h3>
+            Reports I'm Tackling
             <span class="count-badge">{{ ongoing_reports | length }}</span>
           </h3>
           {% if ongoing_reports %}
           <div class="report-list">
             {% for r in ongoing_reports %}
-            <a href="{{ url_for('admin.report_detail', report_id=r.id) }}" class="report-row">
+            <a
+              href="{{ url_for('admin.report_detail', report_id=r.id) }}"
+              class="report-row"
+            >
               <div class="report-row-left">
                 <span class="badge sev-{{ r.severity or 'unknown' }}">
                   {{ (r.severity or '—') | upper }}
                 </span>
                 <div>
-                  <div class="report-desc">{{ r.description | truncate(70) }}</div>
+                  <div class="report-desc">
+                    {{ r.description | truncate(70) }}
+                  </div>
                   <div class="report-meta mono small">
-                    {{ r.created_at.strftime('%b %d, %Y') if r.created_at else '—' }}
-                    &middot; by {{ r.reporter_name }}
+                    {{ r.created_at.strftime('%b %d, %Y') if r.created_at else
+                    '—' }} &middot; by {{ r.reporter_name }}
                   </div>
                 </div>
               </div>
@@ -122,7 +179,11 @@
             <div class="empty-icon">&#128203;</div>
             <h4>No ongoing reports</h4>
             <p>Accept reports from the dashboard to see them here.</p>
-            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary" style="margin-top:16px">
+            <a
+              href="{{ url_for('admin.dashboard') }}"
+              class="btn btn-primary"
+              style="margin-top: 16px"
+            >
               Go to Dashboard
             </a>
           </div>
@@ -132,40 +193,52 @@
         <!-- All reports summary -->
         <div class="profile-section">
           <h3>All Reports Summary</h3>
-          <div class="admin-stats" style="padding:20px 24px">
+          <div class="admin-stats" style="padding: 20px 24px">
             <div class="a-stat">
-              <div class="a-stat-n">{{ all_reports | selectattr('status','eq','pending')   | list | length }}</div>
+              <div class="a-stat-n">
+                {{ all_reports | selectattr('status','eq','pending') | list |
+                length }}
+              </div>
               <div class="a-stat-l">Pending</div>
             </div>
             <div class="a-stat">
-              <div class="a-stat-n">{{ all_reports | selectattr('status','eq','ongoing')   | list | length }}</div>
+              <div class="a-stat-n">
+                {{ all_reports | selectattr('status','eq','ongoing') | list |
+                length }}
+              </div>
               <div class="a-stat-l">Ongoing</div>
             </div>
             <div class="a-stat">
-              <div class="a-stat-n">{{ all_reports | selectattr('status','eq','completed') | list | length }}</div>
+              <div class="a-stat-n">
+                {{ all_reports | selectattr('status','eq','completed') | list |
+                length }}
+              </div>
               <div class="a-stat-l">Completed</div>
             </div>
             <div class="a-stat">
-              <div class="a-stat-n">{{ all_reports | selectattr('status','eq','rejected')  | list | length }}</div>
+              <div class="a-stat-n">
+                {{ all_reports | selectattr('status','eq','rejected') | list |
+                length }}
+              </div>
               <div class="a-stat-l">Rejected</div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
-  const toggle = document.getElementById('edit-toggle');
-  const form   = document.getElementById('edit-form');
-  toggle.addEventListener('click', () => {
-    form.classList.toggle('open');
-    toggle.querySelector('.toggle-arrow').textContent =
-      form.classList.contains('open') ? '&#9652;' : '&#9662;';
+  const toggle = document.getElementById("edit-toggle");
+  const form = document.getElementById("edit-form");
+  toggle.addEventListener("click", () => {
+    form.classList.toggle("open");
+    toggle.querySelector(".toggle-arrow").textContent = form.classList.contains(
+      "open",
+    )
+      ? "&#9652;"
+      : "&#9662;";
   });
 </script>
 {% endblock %}

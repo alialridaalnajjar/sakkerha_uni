@@ -64,10 +64,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-  document.querySelector('.toggle-pw').addEventListener('click', function() {
-    const inp = document.getElementById('password');
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-  });
-</script>
+<script src="{{ url_for('static', filename='scripts/login.js') }}"></script>
 {% endblock %}

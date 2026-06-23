@@ -148,41 +148,14 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{{ url_for('static', filename='scripts/admin.js') }}"></script>
 <script>
-  // Mini detail map
-  const lat = {{ report.latitude }};
-  const lng = {{ report.longitude }};
-  const m   = L.map('detail-map', { zoomControl: true, dragging: true }).setView([lat, lng], 16);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(m);
-  L.circleMarker([lat, lng], {
-    radius: 10, color: '#d63a1d', fillColor: '#d63a1d', fillOpacity: 0.85, weight: 2
-  }).addTo(m).bindPopup('Report #{{ report.id }}').openPopup();
-
-  // Delete button
-  const delBtn = document.getElementById('delete-report-btn');
-  if (delBtn) {
-    delBtn.addEventListener('click', async () => {
-      if (delBtn.disabled) return;
-      if (!confirm('Permanently delete this report? This cannot be undone.')) return;
-      delBtn.disabled  = true;
-      delBtn.innerHTML = '<span class="spinner"></span>';
-      try {
-        const res  = await fetch(`/admin/report/{{ report.id }}/delete`, { method: 'POST' });
-        const data = await res.json();
-        if (data.ok) {
-          window.location.href = "{{ url_for('admin.dashboard') }}";
-        } else {
-          alert(data.error || 'Delete failed.');
-          delBtn.disabled  = false;
-          delBtn.textContent = 'Delete Report Permanently';
-        }
-      } catch (e) {
-        alert('Network error.');
-        delBtn.disabled  = false;
-        delBtn.textContent = 'Delete Report Permanently';
-      }
-    });
-  }
+  // Minimal data handoff from Jinja to the external script —
+  // see explanation below about why this single line can't be moved to a .js file.
+  window.REPORT_DATA = {
+    id: {{ report.id }},
+    lat: {{ report.latitude }},
+    lng: {{ report.longitude }},
+    dashboardUrl: "{{ url_for('admin.dashboard') }}"
+  };
 </script>
+<script src="{{ url_for('static', filename='scripts/admin_detail.js') }}"></script>
 {% endblock %}
