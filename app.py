@@ -12,6 +12,15 @@ app.config.from_object(Config)
 app.config["SQLALCHEMY_DATABASE_URI"]    = Config.DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# fix for neon dropping idle connections on free tier, was causing
+# random "SSL connection has been closed unexpectedly" errors on /map
+# pre_ping checks the connection is alive before using it, recycle
+# closes connections before neon's own ~5min timeout kills them first
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 280,
+}
+
 # creating the mail service for 3rd party pass reset laterr
 mail = Mail(app)
 
