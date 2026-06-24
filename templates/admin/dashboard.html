@@ -111,16 +111,29 @@
                 <a href="{{ url_for('admin.report_detail', report_id=r.id) }}" class="btn-sm btn-outline">View</a>
                 {% if r.status not in ('completed', 'rejected') %}
                   {% if r.status == 'pending' %}
-                    <button class="btn-sm btn-action" data-id="{{ r.id }}" data-status="ongoing">Accept</button>
-                    <button class="btn-sm btn-danger" data-id="{{ r.id }}" data-status="rejected">Reject</button>
+                    <form method="POST" action="{{ url_for('admin.update_status_form', report_id=r.id) }}" style="display:inline">
+                      <input type="hidden" name="status" value="ongoing" />
+                      <button type="submit" class="btn-sm btn-action">Accept</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.update_status_form', report_id=r.id) }}" style="display:inline">
+                      <input type="hidden" name="status" value="rejected" />
+                      <button type="submit" class="btn-sm btn-danger">Reject</button>
+                    </form>
                   {% elif r.status == 'ongoing' %}
-                    <button class="btn-sm btn-action" data-id="{{ r.id }}" data-status="completed">Complete</button>
-                    <button class="btn-sm btn-danger" data-id="{{ r.id }}" data-status="rejected">Reject</button>
+                    <form method="POST" action="{{ url_for('admin.update_status_form', report_id=r.id) }}" style="display:inline">
+                      <input type="hidden" name="status" value="completed" />
+                      <button type="submit" class="btn-sm btn-action">Complete</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.update_status_form', report_id=r.id) }}" style="display:inline">
+                      <input type="hidden" name="status" value="rejected" />
+                      <button type="submit" class="btn-sm btn-danger">Reject</button>
+                    </form>
                   {% endif %}
                 {% endif %}
-                <button class="btn-sm btn-danger delete-report-btn" data-id="{{ r.id }}" title="Delete permanently">
-                  &#x1F5D1;
-                </button>
+                <form method="POST" action="{{ url_for('admin.delete_report_form', report_id=r.id) }}"
+                      style="display:inline" onsubmit="return confirm('Permanently delete report #{{ r.id }}? This cannot be undone.');">
+                  <button type="submit" class="btn-sm btn-danger" title="Delete permanently">&#x1F5D1;</button>
+                </form>
               </div>
             </td>
           </tr>

@@ -99,26 +99,33 @@
         {% if report.status not in ('completed', 'rejected') %}
         <div class="detail-card">
           <div class="detail-section-title">Update Status</div>
-          <div id="action-error" class="form-error" style="display:none"></div>
           <div class="action-stack">
             {% if report.status == 'pending' %}
-              <button class="btn btn-primary btn-full status-btn"
-                      data-id="{{ report.id }}" data-status="ongoing">
-                ✓ Accept → Mark Ongoing
-              </button>
-              <button class="btn btn-danger btn-full status-btn"
-                      data-id="{{ report.id }}" data-status="rejected">
-                ✕ Reject Report
-              </button>
+              <form method="POST" action="{{ url_for('admin.update_status_form', report_id=report.id) }}">
+                <input type="hidden" name="status" value="ongoing" />
+                <button type="submit" class="btn btn-primary btn-full">
+                  &#10003; Accept &rarr; Mark Ongoing
+                </button>
+              </form>
+              <form method="POST" action="{{ url_for('admin.update_status_form', report_id=report.id) }}">
+                <input type="hidden" name="status" value="rejected" />
+                <button type="submit" class="btn btn-danger btn-full">
+                  &#10005; Reject Report
+                </button>
+              </form>
             {% elif report.status == 'ongoing' %}
-              <button class="btn btn-primary btn-full status-btn"
-                      data-id="{{ report.id }}" data-status="completed">
-                ✓ Mark as Completed
-              </button>
-              <button class="btn btn-danger btn-full status-btn"
-                      data-id="{{ report.id }}" data-status="rejected">
-                ✕ Reject Report
-              </button>
+              <form method="POST" action="{{ url_for('admin.update_status_form', report_id=report.id) }}">
+                <input type="hidden" name="status" value="completed" />
+                <button type="submit" class="btn btn-primary btn-full">
+                  &#10003; Mark as Completed
+                </button>
+              </form>
+              <form method="POST" action="{{ url_for('admin.update_status_form', report_id=report.id) }}">
+                <input type="hidden" name="status" value="rejected" />
+                <button type="submit" class="btn btn-danger btn-full">
+                  &#10005; Reject Report
+                </button>
+              </form>
             {% endif %}
           </div>
         </div>
@@ -133,9 +140,12 @@
 
         <div class="detail-card">
           <div class="detail-section-title">Danger Zone</div>
-          <button class="btn btn-danger btn-full" id="delete-report-btn" data-id="{{ report.id }}">
-            Delete Report Permanently
-          </button>
+          <form method="POST" action="{{ url_for('admin.delete_report_form', report_id=report.id) }}"
+                onsubmit="return confirm('Permanently delete this report? This cannot be undone.');">
+            <button type="submit" class="btn btn-danger btn-full">
+              Delete Report Permanently
+            </button>
+          </form>
         </div>
 
       </div>
@@ -146,15 +156,11 @@
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{{ url_for('static', filename='scripts/admin.js') }}"></script>
 <script>
-  // Minimal data handoff from Jinja to the external script —
-  // see explanation below about why this single line can't be moved to a .js file.
   window.REPORT_DATA = {
     id: {{ report.id }},
     lat: {{ report.latitude }},
-    lng: {{ report.longitude }},
-    dashboardUrl: "{{ url_for('admin.dashboard') }}"
+    lng: {{ report.longitude }}
   };
 </script>
 <script src="{{ url_for('static', filename='scripts/admin_detail.js') }}"></script>

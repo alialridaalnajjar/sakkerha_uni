@@ -112,19 +112,24 @@ def submit_report():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 # ── Report detail ─────────────────────────────────────────
-def delete_report(report_id):
+def delete_report_form(report_id):
+    """Plain form-based delete for a user's own report — full page redirect, no AJAX."""
     user_id = session.get("user_id")
     report  = Report.find_by_id(report_id)
 
     if not report:
-        return jsonify({"ok": False, "error": "Report not found."}), 404
+        flash("Report not found.", "error")
+        return redirect(url_for("profile.view"))
     if report.user_id != user_id:
-        return jsonify({"ok": False, "error": "You can only delete your own reports."}), 403
+        flash("You can only delete your own reports.", "error")
+        return redirect(url_for("profile.view"))
     if report.status not in ("pending", "rejected", "invalid"):
-        return jsonify({"ok": False, "error": "Only pending, rejected, or invalid reports can be deleted."}), 400
+        flash("Only pending, rejected, or invalid reports can be deleted.", "error")
+        return redirect(url_for("profile.view"))
 
     Report.delete(report_id)
-    return jsonify({"ok": True})
+    flash("Report deleted.", "info")
+    return redirect(url_for("profile.view"))
 
 
 def report_detail(report_id):

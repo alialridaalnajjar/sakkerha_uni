@@ -74,6 +74,44 @@ def update_status(report_id):
     return jsonify({"ok": True, "new_status": new_status})
 
 
+def update_status_form(report_id):
+    """Plain form-based status update — full page redirect, no AJAX."""
+    new_status = request.form.get("status", "").strip()
+    report      = Report.find_by_id(report_id)
+
+    if not report:
+        flash("Report not found.", "error")
+        return redirect(url_for("admin.dashboard"))
+
+    if new_status not in Report.STATUSES:
+        flash(f"Invalid status: {new_status}", "error")
+        return redirect(url_for("admin.report_detail", report_id=report_id))
+
+    if report.status in ("completed", "rejected"):
+        flash(f"Cannot change a {report.status} report.", "error")
+        return redirect(url_for("admin.report_detail", report_id=report_id))
+
+    Report.update_status(report_id, new_status)
+    flash(f"Report #{report_id} marked as {new_status}.", "success")
+
+    # Send them back to wherever they came from — dashboard or detail page
+    referrer = request.referrer or ""
+    if "/admin/report/" in referrer and "/status" not in referrer:
+        return redirect(url_for("admin.report_detail", report_id=report_id))
+    return redirect(url_for("admin.dashboard"))
+
+
+def delete_report_form(report_id):
+    """Plain form-based delete — full page redirect, no AJAX."""
+    report = Report.find_by_id(report_id)
+    if not report:
+        flash("Report not found.", "error")
+        return redirect(url_for("admin.dashboard"))
+    Report.delete(report_id)
+    flash(f"Report #{report_id} deleted permanently.", "info")
+    return redirect(url_for("admin.dashboard"))
+
+
 # ── Admin profile ─────────────────────────────────────────
 def admin_profile():
     user_id         = session.get("user_id")
@@ -148,11 +186,3 @@ def admin_remove_pfp():
     session["user_pfp"] = None
     flash("Profile picture removed.", "info")
     return redirect(url_for("admin.profile"))
-
-
-def delete_report(report_id):
-    report = Report.find_by_id(report_id)
-    if not report:
-        return jsonify({"ok": False, "error": "Report not found."}), 404
-    Report.delete(report_id)
-    return jsonify({"ok": True})
