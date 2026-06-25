@@ -132,7 +132,7 @@
         {% else %}
         <div class="detail-card">
           <div class="detail-section-title">Status</div>
-          <p style="color:var(--muted);font-size:14px">
+          <p class="status-final-text">
             This report is <strong>{{ report.status }}</strong> and can no longer be changed.
           </p>
         </div>
@@ -140,8 +140,7 @@
 
         <div class="detail-card">
           <div class="detail-section-title">Danger Zone</div>
-          <form method="POST" action="{{ url_for('admin.delete_report_form', report_id=report.id) }}"
-                onsubmit="return confirm('Permanently delete this report? This cannot be undone.');">
+          <form method="POST" action="{{ url_for('admin.delete_report_form', report_id=report.id) }}">
             <button type="submit" class="btn btn-danger btn-full">
               Delete Report Permanently
             </button>

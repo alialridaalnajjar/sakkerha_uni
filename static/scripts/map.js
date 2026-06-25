@@ -261,6 +261,7 @@ function initReportModal() {
     successEl.style.display = "none";
 
     // Gather coords
+    // no2
     let lat, lng;
     const isManual = tabManual.classList.contains("active");
     if (isManual) {
@@ -288,6 +289,7 @@ function initReportModal() {
     submitBtn.innerHTML = '<span class="spinner"></span>Analysing with AI…';
 
     // Build multipart form — send files directly to Flask
+    // no3
     const body = new FormData();
     body.append("description", desc);
     body.append("latitude", lat);
@@ -299,6 +301,7 @@ function initReportModal() {
     });
 
     try {
+      //#no4
       const res = await fetch(window.SUBMIT_URL, { method: "POST", body });
       const data = await res.json();
       if (data.ok) {
