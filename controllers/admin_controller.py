@@ -27,7 +27,7 @@ def map_view():
     } for r in public_reports])
     return render_template("admin/map.html", reports_json=reports_json)
 
-
+    
 # ── Dashboard ─────────────────────────────────────────────
 def dashboard():
     status   = request.args.get("status",   "").strip() or None
@@ -75,7 +75,7 @@ def update_status(report_id):
 
 
 def update_status_form(report_id):
-    """Plain form-based status update — full page redirect, no AJAX."""
+    """Plain form-based status update — full page redirect."""
     new_status = request.form.get("status", "").strip()
     report      = Report.find_by_id(report_id)
 
@@ -102,7 +102,7 @@ def update_status_form(report_id):
 
 
 def delete_report_form(report_id):
-    """Plain form-based delete — full page redirect, no AJAX."""
+    """Plain form-based delete — full page redirect."""
     report = Report.find_by_id(report_id)
     if not report:
         flash("Report not found.", "error")

@@ -119,11 +119,11 @@ def logout():
     return redirect(url_for("auth.home"))
 
 
-# ── Forgot password ───────────────────────────────────────
+# ── Forgot password -> encrypt the toekn for forget PASSWORD 
 def _get_serializer():
     return URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
 
-
+# show the forget pass page to reset
 def show_forgot_password():
     return render_template("auth/forgot_password.html")
 
@@ -223,7 +223,7 @@ def handle_reset_password(token):
     return redirect(url_for("auth.login"))
 
 
-# ── Internal ──────────────────────────────────────────────
+# ── Internal 
 def _redirect_by_role():
     if session.get("user_role") == "admin":
         return redirect(url_for("admin.dashboard"))

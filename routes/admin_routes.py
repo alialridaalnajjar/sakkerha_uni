@@ -21,6 +21,7 @@ def admin_required(f):
     return decorated
 
 
+
 admin_bp.add_url_rule("/",                              "dashboard",    admin_required(dashboard),          methods=["GET"])
 admin_bp.add_url_rule("/map",                           "map_view",     admin_required(map_view),           methods=["GET"])
 admin_bp.add_url_rule("/profile",                       "profile",      admin_required(admin_profile),      methods=["GET"])

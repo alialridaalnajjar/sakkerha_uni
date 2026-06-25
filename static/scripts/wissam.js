@@ -1,8 +1,3 @@
-/* ════════════════════════════════════════════════════════
-   Wissam — Sakkerha's 3D mascot
-   Built with Three.js primitives (low-poly, flat-shaded)
-   Lives bottom-right on the landing page.
-════════════════════════════════════════════════════════ */
 
 (function () {
   const HINTS = [
@@ -21,12 +16,13 @@
   let dismissed = false;
 
   function init() {
-    container = document.getElementById('wissam-container');
-    if (!container || typeof THREE === 'undefined') return;
+    container = document.getElementById("wissam-container");
+    if (!container || typeof THREE === "undefined") return;
 
-    const w = 140, h = 160;
+    const w = 140,
+      h = 160;
 
-    scene  = new THREE.Scene();
+    scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 100);
     camera.position.set(0, 0.3, 5.2);
 
@@ -51,35 +47,58 @@
     // Shoulders / torso (flattened sphere)
     const shoulderGeo = new THREE.SphereGeometry(1.3, 16, 12);
     shoulderGeo.scale(1, 0.55, 0.85);
-    const shoulderMat = new THREE.MeshLambertMaterial({ color: shirtColor, flatShading: true });
+    const shoulderMat = new THREE.MeshLambertMaterial({
+      color: shirtColor,
+      flatShading: true,
+    });
     const shoulders = new THREE.Mesh(shoulderGeo, shoulderMat);
     shoulders.position.y = -1.05;
     headGroup.add(shoulders);
 
     // Neck
     const neckGeo = new THREE.CylinderGeometry(0.32, 0.36, 0.35, 10);
-    const neckMat = new THREE.MeshLambertMaterial({ color: skinColor, flatShading: true });
+    const neckMat = new THREE.MeshLambertMaterial({
+      color: skinColor,
+      flatShading: true,
+    });
     const neck = new THREE.Mesh(neckGeo, neckMat);
     neck.position.y = -0.55;
     headGroup.add(neck);
 
     // Head (low-poly sphere)
     const headGeo = new THREE.SphereGeometry(0.85, 14, 12);
-    const headMat = new THREE.MeshLambertMaterial({ color: skinColor, flatShading: true });
+    const headMat = new THREE.MeshLambertMaterial({
+      color: skinColor,
+      flatShading: true,
+    });
     const head = new THREE.Mesh(headGeo, headMat);
     head.position.y = 0.25;
     headGroup.add(head);
 
     // Hair (simple dark cap, top half sphere)
-    const hairGeo = new THREE.SphereGeometry(0.88, 14, 12, 0, Math.PI * 2, 0, Math.PI * 0.55);
-    const hairMat = new THREE.MeshLambertMaterial({ color: 0x2b2118, flatShading: true });
+    const hairGeo = new THREE.SphereGeometry(
+      0.88,
+      14,
+      12,
+      0,
+      Math.PI * 2,
+      0,
+      Math.PI * 0.55,
+    );
+    const hairMat = new THREE.MeshLambertMaterial({
+      color: 0x2b2118,
+      flatShading: true,
+    });
     const hair = new THREE.Mesh(hairGeo, hairMat);
     hair.position.y = 0.45;
     headGroup.add(hair);
 
     // Eyes (small dark spheres)
     const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
-    const eyeMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a, flatShading: true });
+    const eyeMat = new THREE.MeshLambertMaterial({
+      color: 0x1a1a1a,
+      flatShading: true,
+    });
     const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
     eyeL.position.set(-0.3, 0.28, 0.72);
     const eyeR = eyeL.clone();
@@ -88,7 +107,10 @@
 
     // Mouth (small flattened box, slight smile)
     const mouthGeo = new THREE.BoxGeometry(0.34, 0.06, 0.05);
-    const mouthMat = new THREE.MeshLambertMaterial({ color: 0x8a4a3a, flatShading: true });
+    const mouthMat = new THREE.MeshLambertMaterial({
+      color: 0x8a4a3a,
+      flatShading: true,
+    });
     const mouth = new THREE.Mesh(mouthGeo, mouthMat);
     mouth.position.set(0, -0.02, 0.82);
     mouth.rotation.z = 0.0;
@@ -119,52 +141,49 @@
   }
 
   function showHint() {
-    const bubble = document.getElementById('wissam-bubble');
+    const bubble = document.getElementById("wissam-bubble");
     if (!bubble) return;
     const hint = HINTS[Math.floor(Math.random() * HINTS.length)];
     bubble.textContent = hint;
-    bubble.classList.add('show');
+    bubble.classList.add("show");
     clearTimeout(bubble._hideTimer);
-    bubble._hideTimer = setTimeout(() => bubble.classList.remove('show'), 5000);
+    bubble._hideTimer = setTimeout(() => bubble.classList.remove("show"), 5000);
   }
 
   function dismissWissam() {
     dismissed = true;
-    const wrap = document.getElementById('wissam-wrap');
-    if (wrap) wrap.style.display = 'none';
+    const wrap = document.getElementById("wissam-wrap");
+    if (wrap) wrap.style.display = "none";
     try {
-      sessionStorage.setItem('wissam_dismissed', '1');
+      sessionStorage.setItem("wissam_dismissed", "1");
     } catch (e) {}
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     let alreadyDismissed = false;
     try {
-      alreadyDismissed = sessionStorage.getItem('wissam_dismissed') === '1';
+      alreadyDismissed = sessionStorage.getItem("wissam_dismissed") === "1";
     } catch (e) {}
 
     if (alreadyDismissed) {
-      const wrap = document.getElementById('wissam-wrap');
-      if (wrap) wrap.style.display = 'none';
+      const wrap = document.getElementById("wissam-wrap");
+      if (wrap) wrap.style.display = "none";
       return;
     }
 
     init();
 
-    const clickTarget = document.getElementById('wissam-container');
-    if (clickTarget) clickTarget.addEventListener('click', showHint);
+    const clickTarget = document.getElementById("wissam-container");
+    if (clickTarget) clickTarget.addEventListener("click", showHint);
 
-    const closeBtn = document.getElementById('wissam-close');
-    if (closeBtn) closeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dismissWissam();
-    });
+    const closeBtn = document.getElementById("wissam-close");
+    if (closeBtn)
+      closeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dismissWissam();
+      });
 
     // Greet after a short delay
     setTimeout(showHint, 1200);
   });
 })();
-
-
-
-
